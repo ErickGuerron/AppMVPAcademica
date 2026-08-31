@@ -20,6 +20,13 @@
   --color-ink-300: #a7b4b7;
 
   --color-line: #e4e9e8;
+
+  /* AURA palette */
+  --color-aura-sidebar: #0b1739;
+  --color-aura-sidebar-soft: #13224f;
+  --color-aura-sidebar-border: #1d3572;
+  --color-aura-primary: #0d44b5;
+  --color-aura-primary-light: #8faef4;
 }
 
 html, body {
@@ -28,6 +35,6 @@ html, body {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-brand-50);
-  color: var(--color-ink-900);
+  background-color: #f1f5f9;
+  color: #1e293b;
 }
