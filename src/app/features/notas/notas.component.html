@@ -1,0 +1,42 @@
+<div class="flex items-start justify-between mb-5">
+  <div>
+    <p class="text-[11px] font-semibold tracking-wider text-ink-300 uppercase mb-1">Periodo académico 2026</p>
+    <h2 class="text-lg font-bold text-ink-900">Tu progreso académico</h2>
+  </div>
+
+  <div class="rounded-xl bg-brand-100 px-5 py-3 text-right">
+    <p class="text-[11px] font-semibold tracking-wider text-brand-700 uppercase">Promedio</p>
+    <p class="text-xl font-bold text-brand-900">{{ academico.calificaciones.value().promedio }}/10</p>
+  </div>
+</div>
+
+<div class="rounded-xl border border-line bg-white overflow-hidden">
+  <div class="grid grid-cols-[1fr_auto] gap-4 px-6 py-3 border-b border-line">
+    <span class="text-[11px] font-semibold tracking-wider text-ink-300 uppercase">Asignatura</span>
+    <span class="text-[11px] font-semibold tracking-wider text-ink-300 uppercase">Calificación</span>
+  </div>
+
+  @if (academico.calificaciones.isLoading()) {
+    <p class="px-6 py-6 text-sm text-ink-500">Cargando calificaciones...</p>
+  }
+
+  @if (academico.calificaciones.error()) {
+    <p class="px-6 py-6 text-sm text-red-600">
+      No se pudieron cargar las calificaciones. Verifica que el mock API esté corriendo.
+    </p>
+  }
+
+  @for (item of academico.calificaciones.value().calificaciones; track item.curso) {
+    <div class="grid grid-cols-[1fr_auto] gap-4 items-center px-6 py-4 border-b border-line last:border-b-0">
+      <div>
+        <p class="text-sm font-bold text-ink-900">{{ item.curso }}</p>
+        <p class="text-xs text-ink-500">{{ item.profesor }}</p>
+      </div>
+      <span class="text-sm font-bold text-ink-900 justify-self-end">{{ item.nota }}</span>
+    </div>
+  } @empty {
+    @if (!academico.calificaciones.isLoading()) {
+      <p class="px-6 py-8 text-sm text-ink-500 text-center">Aún no tienes calificaciones registradas.</p>
+    }
+  }
+</div>
