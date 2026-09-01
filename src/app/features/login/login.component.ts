@@ -2,11 +2,12 @@ import { Component, signal, inject } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { Router } from "@angular/router";
 import { AuthService } from "../../core/services/auth.service";
+import { ForgotPasswordComponent } from "./forgot-password.component";
 
 @Component({
   selector: "app-login",
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, ForgotPasswordComponent],
   templateUrl: "./login.component.html",
 })
 export class LoginComponent {
@@ -17,6 +18,7 @@ export class LoginComponent {
   readonly password = signal("");
   readonly cargando = signal(false);
   readonly errorMsg = signal("");
+  readonly mostrarRecuperar = signal(false);
 
   onSubmit(): void {
     this.errorMsg.set("");
@@ -34,5 +36,13 @@ export class LoginComponent {
         );
       },
     });
+  }
+
+  mostrarRecuperarContrasena(): void {
+    this.mostrarRecuperar.set(true);
+  }
+
+  volverALogin(): void {
+    this.mostrarRecuperar.set(false);
   }
 }

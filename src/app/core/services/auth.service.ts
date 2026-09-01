@@ -36,6 +36,10 @@ export class AuthService {
     return localStorage.getItem(TOKEN_KEY);
   }
 
+  recuperarContrasena(email: string): Observable<{ mensaje: string }> {
+    return this.http.post<{ mensaje: string }>(`${API_URL}/recuperar-contrasena`, { email });
+  }
+
   private leerUsuarioGuardado(): Usuario | null {
     const raw = localStorage.getItem(USUARIO_KEY);
     return raw ? (JSON.parse(raw) as Usuario) : null;
