@@ -1,22 +1,71 @@
 <section class="flex flex-col gap-4 md:gap-6">
 
-  <!-- HEADER -->
-  <header class="bg-aura-sidebar rounded-xl md:rounded-2xl p-4 md:p-5 text-white shadow-md flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-    <div class="flex items-start gap-4">
-      <div class="bg-amber-400/20 text-amber-400 w-10 h-10 rounded-lg flex items-center justify-center text-base shrink-0" title="Calificaciones del semestre">
+  <!-- HEADER + RESUMEN DEL SEMESTRE (misma fila desde lg, apilado antes) -->
+  <div class="flex flex-col lg:flex-row lg:items-center gap-4 md:gap-6">
+    <header class="flex items-start gap-4 lg:shrink-0">
+      <div class="bg-amber-50 text-amber-500 w-10 h-10 rounded-lg flex items-center justify-center text-base shrink-0" title="Calificaciones del semestre">
         <i class="fa-solid fa-award" aria-hidden="true"></i>
       </div>
       <div>
-        <h1 class="text-xl md:text-2xl font-bold mb-1">Calificaciones</h1>
-        <p class="text-slate-300 text-sm font-medium">Revisa tus calificaciones y tu desempeño académico.</p>
+        <h1 class="text-xl md:text-2xl font-bold text-slate-800 mb-1">Calificaciones</h1>
+        <p class="text-slate-500 text-sm font-medium">Revisa tus calificaciones y tu desempeño académico.</p>
+      </div>
+    </header>
+
+    <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm lg:flex-1">
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <p class="flex items-center gap-2 text-[11px] font-bold text-slate-400 tracking-wider">
+          <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+          RESUMEN DEL SEMESTRE
+        </p>
+
+        @if (enRiesgo()) {
+          <span
+            class="rounded-full bg-red-50 text-red-600 px-3 py-1 text-[11px] font-bold"
+            [title]="enRiesgo() + ' materia(s) por debajo de 7'"
+          >
+            {{ enRiesgo() }} en riesgo
+          </span>
+        } @else {
+          <span
+            class="rounded-full bg-emerald-50 text-emerald-600 px-3 py-1 text-[11px] font-bold"
+            title="Ninguna materia por debajo de 7"
+          >
+            Todo al día
+          </span>
+        }
+      </div>
+
+      <div class="grid grid-cols-3 gap-2">
+        <div
+          class="flex flex-col items-center gap-0.5 rounded-xl border border-aura-primary bg-aura-primary text-white shadow-sm px-2 py-2.5"
+          title="Promedio de todas tus materias del semestre"
+        >
+          <span class="text-[11px] font-semibold tracking-wide text-white/80">PROMEDIO</span>
+          <span class="text-lg font-bold leading-none">{{ promedio() }}</span>
+          <span class="text-[10px] font-medium text-white/70">sobre 10</span>
+        </div>
+
+        <div
+          class="flex flex-col items-center gap-0.5 rounded-xl border border-slate-200 bg-white px-2 py-2.5"
+          title="Materias matriculadas este semestre"
+        >
+          <span class="text-[11px] font-semibold tracking-wide text-slate-400">MATERIAS</span>
+          <span class="text-lg font-bold leading-none text-slate-700">{{ totalMaterias() }}</span>
+          <span class="text-[10px] font-medium text-slate-400">matriculadas</span>
+        </div>
+
+        <div
+          class="flex flex-col items-center gap-0.5 rounded-xl border border-slate-200 bg-white px-2 py-2.5"
+          [title]="aprobadas() + ' de ' + totalMaterias() + ' materias con nota 7 o mayor'"
+        >
+          <span class="text-[11px] font-semibold tracking-wide text-slate-400">APROBADAS</span>
+          <span class="text-lg font-bold leading-none text-slate-700">{{ aprobadas() }}</span>
+          <span class="text-[10px] font-medium text-slate-400">de {{ totalMaterias() }}</span>
+        </div>
       </div>
     </div>
-
-    <div class="bg-aura-sidebar-soft rounded-2xl p-4 w-full sm:w-48 shrink-0" title="Promedio de todas tus materias del semestre">
-      <p class="text-xs text-slate-400 font-semibold tracking-wider mb-1">PROMEDIO GENERAL</p>
-      <p class="text-3xl font-bold">{{ academico.calificaciones.value().promedio }}</p>
-    </div>
-  </header>
+  </div>
 
   <!-- MATERIAS DEL SEMESTRE -->
   <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm">

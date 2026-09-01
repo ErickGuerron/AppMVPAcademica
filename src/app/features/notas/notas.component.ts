@@ -37,6 +37,15 @@ export class NotasComponent {
     }
   });
 
+  protected readonly promedio = computed(() => this.academico.calificaciones.value().promedio);
+
+  protected readonly totalMaterias = computed(() => this.calificaciones().length);
+
+  /** Aprobadas = nota >= 7, mismo corte que usa `estadoNota`. */
+  protected readonly aprobadas = computed(() => this.calificaciones().filter((c) => c.nota >= 7).length);
+
+  protected readonly enRiesgo = computed(() => this.calificaciones().filter((c) => c.nota < 7).length);
+
   cambiarOrden(orden: Orden): void {
     this.orden.set(orden);
   }
