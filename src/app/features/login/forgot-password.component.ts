@@ -28,6 +28,7 @@ import { AuthService } from "../../core/services/auth.service";
               [ngModel]="email()"
               (ngModelChange)="email.set($event)"
               placeholder="Ingresa tu correo institucional"
+              title="Correo institucional donde recibiras el enlace"
               class="w-full pl-8 pr-4 py-3 bg-white border border-gray-200 rounded-lg text-xs font-mono-custom text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0a1931] focus:border-transparent transition-all"
             />
           </div>
@@ -45,6 +46,7 @@ import { AuthService } from "../../core/services/auth.service";
         <button 
           type="submit" 
           [disabled]="cargando() || forgotForm.invalid"
+          [title]="forgotForm.invalid ? 'Ingresa un correo valido para continuar' : 'Enviar el enlace de recuperacion'"
           class="w-full bg-[#0a1931] hover:bg-blue-950 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono-custom text-sm font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-md">
           {{ cargando() ? 'Enviando...' : 'Recuperar contrasena' }}
         </button>
@@ -54,6 +56,7 @@ import { AuthService } from "../../core/services/auth.service";
     <button
       type="button"
       (click)="volver.emit()"
+      title="Volver al formulario de inicio de sesion"
       class="w-full text-center font-mono-custom text-xs text-gray-500 hover:text-[#0a1931] transition-colors mb-8">
       Volver al inicio de sesion
     </button>

@@ -1,8 +1,9 @@
 import { Component, inject, signal } from "@angular/core";
-import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from "@angular/router";
+import { RouterOutlet, Router, NavigationEnd } from "@angular/router";
 import { filter, map, startWith } from "rxjs";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { AuthService } from "../../core/services/auth.service";
+import { SidebarComponent } from "../sidebar/sidebar.component";
+import { NavbarComponent } from "../navbar/navbar.component";
 
 interface RouteHeaderData {
   breadcrumb: string;
@@ -12,11 +13,10 @@ interface RouteHeaderData {
 @Component({
   selector: "app-layout",
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, SidebarComponent, NavbarComponent],
   templateUrl: "./layout.component.html",
 })
 export class LayoutComponent {
-  protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   /**
@@ -66,11 +66,5 @@ export class LayoutComponent {
 
   closeSidebar(): void {
     this.sidebarOpen.set(false);
-  }
-
-  onLogout(): void {
-    this.closeSidebar();
-    this.auth.logout();
-    this.router.navigate(["/login"]);
   }
 }

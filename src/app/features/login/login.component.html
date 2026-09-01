@@ -29,7 +29,7 @@
       <!-- Logo -->
       <div class="w-full text-left mb-8">
         <div class="flex items-center gap-3 mb-2">
-          <div class="w-8 h-8 rounded bg-[#0a1931] flex items-center justify-center text-white font-bold text-sm">
+          <div class="w-8 h-8 rounded bg-[#0a1931] flex items-center justify-center text-white font-bold text-sm" title="AURA · Sistema Universitario de Gestion Academica">
             H
           </div>
           <span class="text-2xl font-bold tracking-wider text-[#0a1931]">AURA</span>
@@ -84,6 +84,7 @@
                   [ngModel]="correo()"
                   (ngModelChange)="correo.set($event)"
                   placeholder="Ingresa tu nombre de usuario"
+                  title="Tu usuario o correo institucional"
                   class="w-full pl-8 pr-4 py-3 bg-white border border-gray-200 rounded-lg text-xs font-mono-custom text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0a1931] focus:border-transparent transition-all"
                 />
               </div>
@@ -106,6 +107,7 @@
                   [ngModel]="password()"
                   (ngModelChange)="password.set($event)"
                   placeholder="Ingresa tu contrasena"
+                  title="Tu contrasena del portal"
                   class="w-full pl-8 pr-4 py-3 bg-white border border-gray-200 rounded-lg text-xs font-mono-custom text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0a1931] focus:border-transparent transition-all"
                 />
               </div>
@@ -115,6 +117,7 @@
               <button 
                 type="button"
                 (click)="mostrarRecuperarContrasena()"
+                title="Recuperar tu contrasena por correo"
                 class="font-mono-custom text-xs text-blue-700 hover:underline font-medium bg-transparent border-none cursor-pointer">
                 Olvidaste tu contrasena?
               </button>
@@ -127,6 +130,7 @@
             <button 
               type="submit" 
               [disabled]="cargando() || loginForm.invalid"
+              [title]="loginForm.invalid ? 'Completa usuario y contrasena para continuar' : 'Entrar al portal'"
               class="w-full bg-[#0a1931] hover:bg-blue-950 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono-custom text-sm font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-md">
               {{ cargando() ? 'Ingresando...' : 'Ingresar' }}
             </button>

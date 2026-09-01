@@ -29,6 +29,15 @@
   --color-aura-primary-light: #8faef4;
 }
 
+/*
+ * Escala base de la UI. Tailwind mide tipografia y espaciado en rem, asi que
+ * bajar el font-size raiz encoge texto, paddings y gaps de forma proporcional
+ * y mantiene las proporciones del diseno.
+ */
+html {
+  font-size: 93.75%; /* 15px */
+}
+
 html, body {
   height: 100%;
 }

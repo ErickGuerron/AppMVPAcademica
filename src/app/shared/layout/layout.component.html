@@ -1,4 +1,4 @@
-<div class="min-h-screen flex bg-slate-100 text-slate-800">
+<div class="h-screen overflow-hidden flex bg-slate-100 text-slate-800">
 
   <!-- BACKDROP SOLO EN MÓVIL Y TABLET -->
   @if (sidebarOpen()) {
@@ -10,102 +10,20 @@
   }
 
   <!-- SIDEBAR (drawer en móvil/tablet, fijo en lg+) -->
-  <aside
-    class="w-64 bg-aura-sidebar flex flex-col justify-between text-white p-6
-           fixed inset-y-0 left-0 z-40 transition-transform duration-300 ease-in-out
-           lg:relative lg:translate-x-0 lg:transition-none"
-    [class.translate-x-0]="sidebarOpen()"
-    [class.-translate-x-full]="!sidebarOpen()"
-    [attr.aria-hidden]="!sidebarOpen() ? 'true' : null"
-  >
-    <div>
-      <!-- Logo -->
-      <div class="flex items-center gap-3 mb-10">
-        <div class="bg-white text-aura-sidebar font-bold text-xl rounded-md w-10 h-10 flex items-center justify-center shrink-0">H</div>
-        <h1 class="text-2xl font-bold tracking-wide">AURA</h1>
-      </div>
-
-      <!-- Navegacion -->
-      <div class="mb-8">
-        <p class="text-xs font-semibold text-slate-400 mb-4 tracking-wider">NAVEGACION</p>
-        <nav class="space-y-2">
-          <a
-            routerLink="/resumen"
-            routerLinkActive="bg-aura-primary text-white"
-            [routerLinkActiveOptions]="{ exact: true }"
-            class="flex items-center gap-3 py-3 px-4 rounded-xl font-medium text-slate-300 hover:bg-aura-sidebar-soft hover:text-white transition"
-          >
-            <i class="fa-solid fa-house w-5"></i> Inicio
-          </a>
-          <a
-            routerLink="/horario"
-            routerLinkActive="bg-aura-primary text-white"
-            class="flex items-center gap-3 py-3 px-4 rounded-xl text-slate-300 hover:bg-aura-sidebar-soft hover:text-white transition"
-          >
-            <i class="fa-regular fa-calendar w-5"></i> Horario
-          </a>
-          <a
-            routerLink="/notas"
-            routerLinkActive="bg-aura-primary text-white"
-            class="flex items-center gap-3 py-3 px-4 rounded-xl text-slate-300 hover:bg-aura-sidebar-soft hover:text-white transition"
-          >
-            <i class="fa-solid fa-award w-5"></i> Calificaciones
-          </a>
-          <a
-            href="#"
-            class="flex items-center gap-3 py-3 px-4 rounded-xl text-slate-300 opacity-70 cursor-not-allowed transition"
-          >
-            <i class="fa-regular fa-user w-5"></i> Perfil
-          </a>
-        </nav>
-      </div>
-
-      <!-- Cuenta -->
-      <div>
-        <p class="text-xs font-semibold text-slate-400 mb-4 tracking-wider">CUENTA</p>
-        <nav class="space-y-2">
-          <a
-            href="#"
-            class="flex items-center gap-3 py-2 px-4 rounded-xl text-slate-300 opacity-70 cursor-not-allowed transition"
-          >
-            <i class="fa-solid fa-ellipsis w-5"></i> Ajustes
-          </a>
-          <button
-            type="button"
-            (click)="onLogout()"
-            class="w-full flex items-center gap-3 py-2 px-4 rounded-xl text-slate-300 hover:text-white transition text-left"
-          >
-            <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Cerrar sesion
-          </button>
-        </nav>
-      </div>
-    </div>
-
-    <!-- Usuario Footer -->
-    @if (auth.usuario(); as usuario) {
-      <div class="bg-aura-sidebar-soft rounded-2xl p-4 flex items-center gap-3 mt-4">
-        <div class="bg-aura-primary-light text-aura-sidebar w-10 h-10 rounded-full flex items-center justify-center font-bold shrink-0">
-          {{ usuario.iniciales }}
-        </div>
-        <div class="min-w-0">
-          <p class="font-semibold text-sm truncate">{{ usuario.nombre }}</p>
-          <p class="text-xs text-slate-400 capitalize">{{ usuario.rol }}</p>
-        </div>
-      </div>
-    }
-  </aside>
+  <app-sidebar [open]="sidebarOpen()" />
 
   <!-- COLUMNA PRINCIPAL -->
-  <div class="flex-1 min-w-0 flex flex-col">
+  <div class="flex-1 min-w-0 flex flex-col h-full overflow-hidden">
 
     <!-- BARRA MÓVIL/TABLET: hamburger + branding (oculta en lg+) -->
-    <header class="lg:hidden sticky top-0 z-20 bg-aura-sidebar text-white flex items-center gap-3 px-4 h-14 shadow-md">
+    <header class="lg:hidden shrink-0 z-20 bg-aura-sidebar text-white flex items-center gap-3 px-4 h-14 shadow-md">
       <button
         type="button"
         (click)="toggleSidebar()"
         class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-aura-sidebar-soft transition"
         [attr.aria-expanded]="sidebarOpen()"
-        aria-label="Abrir menú"
+        [attr.aria-label]="sidebarOpen() ? 'Cerrar menú' : 'Abrir menú'"
+        [title]="sidebarOpen() ? 'Cerrar menú' : 'Abrir menú'"
       >
         <i class="fa-solid fa-bars text-lg"></i>
       </button>
@@ -115,8 +33,11 @@
       </div>
     </header>
 
+    <!-- NAVBAR (buscador, notificaciones, fecha, avatar) -->
+    <app-navbar class="shrink-0" />
+
     <!-- Contenido -->
-    <main class="flex-1 min-w-0 overflow-y-auto">
+    <main class="flex-1 min-w-0 overflow-y-auto px-4 md:px-6 pt-2 pb-6">
       <router-outlet />
     </main>
   </div>

@@ -31,7 +31,6 @@ export class ResumenComponent {
   protected readonly hoy = new Date();
   protected readonly nombreDia = DIAS_LARGO[this.hoy.getDay()];
   protected readonly mesLargo = MESES_LARGO[this.hoy.getMonth()];
-  protected readonly fechaCorta = `${this.hoy.getDate()} ${MESES_LARGO[this.hoy.getMonth()].slice(0, 3)}`;
 
   protected readonly nombreUsuario = computed(() => {
     const u = this.auth.usuario();
