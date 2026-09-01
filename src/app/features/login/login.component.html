@@ -1,87 +1,159 @@
-<div class="min-h-screen flex flex-col md:flex-row">
-  <!-- Panel izquierdo -->
-  <div class="md:w-1/2 bg-brand-900 text-white flex flex-col justify-between px-10 py-12 md:px-16 md:py-16">
-    <div class="flex items-center gap-2 text-sm font-semibold">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="1.8" class="w-5 h-5">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M4.5 10 12 6l7.5 4-7.5 4-7.5-4Zm0 0v5.5M9 12.3v4.2c0 .5 1.3 1.5 3 1.5s3-1 3-1.5v-4.2" />
-      </svg>
-      Campus
-    </div>
+<div class="h-screen w-screen overflow-hidden flex">
+  <!-- Panel izquierdo (hidden on mobile, flex on lg) -->
+  <div class="hidden lg:flex lg:w-1/2 bg-[#0a1931] relative flex-col justify-center px-16 text-white overflow-hidden select-none">
+    
+    <div class="absolute -top-16 -left-16 w-80 h-80 rounded-full bg-blue-900/30 blur-sm pointer-events-none"></div>
+    <div class="absolute top-0 right-0 w-48 h-48 bg-blue-800/20 pointer-events-none"></div>
+    <div class="absolute -bottom-20 -left-10 w-96 h-96 rounded-full bg-blue-900/20 pointer-events-none"></div>
+    <div class="absolute bottom-20 right-0 w-64 h-64 bg-blue-800/20 pointer-events-none"></div>
+    <div class="absolute -bottom-10 right-20 w-96 h-96 rounded-full bg-blue-600/30 pointer-events-none"></div>
+    <div class="absolute -bottom-12 -left-12 w-96 h-24 bg-blue-600 rounded-full pointer-events-none"></div>
 
-    <div>
-      <p class="text-xs tracking-widest text-brand-100/80 mb-4 uppercase">
-        Tu vida universitaria, en un solo lugar
-      </p>
-      <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
-        Aprende.<br />
-        <span class="text-accent-500">Avanza.</span><br />
-        Conecta.
-      </h1>
-      <p class="text-brand-100/80 max-w-xs text-sm">
-        Consulta tus notas, organiza tu semana y mantén el ritmo de tu carrera
+    <div class="z-10 max-w-lg">
+      <h1 class="text-7xl font-bold tracking-wider mb-8">AURA</h1>
+      <h2 class="font-mono-custom text-4xl leading-tight font-medium mb-6 text-blue-100">
+        Tu<br>
+        plataforma<br>
+        universitaria
+      </h2>
+      <p class="font-mono-custom text-sm text-blue-200/80 leading-relaxed max-w-sm">
+        Consulta tus clases, calificaciones y horarios desde un solo lugar. Diseñada para desktop.
       </p>
     </div>
-
-    <p class="text-xs text-brand-100/60">Periodo 2026 · Portal estudiantil</p>
   </div>
 
   <!-- Panel derecho -->
-  <div class="md:w-1/2 bg-brand-50 flex items-center justify-center px-6 py-16">
-    <div class="w-full max-w-sm">
-      <p class="text-sm text-ink-500 mb-1">Bienvenido de vuelta</p>
-      <h2 class="text-2xl font-bold text-ink-900 mb-1">Inicia sesión</h2>
-      <p class="text-sm text-ink-500 mb-8">Accede a tu espacio académico.</p>
+  <div class="w-full lg:w-1/2 bg-white flex flex-col justify-center items-center px-8 py-12 overflow-y-auto">
+    <div class="w-full max-w-md flex flex-col items-center">
+      
+      <!-- Logo -->
+      <div class="w-full text-left mb-8">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded bg-[#0a1931] flex items-center justify-center text-white font-bold text-sm">
+            H
+          </div>
+          <span class="text-2xl font-bold tracking-wider text-[#0a1931]">AURA</span>
+        </div>
+        <p class="font-mono-custom text-xs text-gray-500">
+          Sistema Universitario de Gestion Academica
+        </p>
+      </div>
 
-      <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="space-y-5">
-        <div>
-          <label for="correo" class="block text-xs font-semibold text-ink-700 mb-1.5">Correo institucional</label>
-          <input
-            id="correo"
-            name="correo"
-            type="email"
-            required
-            autocomplete="username"
-            [ngModel]="correo()"
-            (ngModelChange)="correo.set($event)"
-            placeholder="estudiante@uta.edu.ec"
-            class="w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-sm text-ink-900 placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-brand-700/30 focus:border-brand-700"
-          />
+      @if (mostrarRecuperar()) {
+        <!-- Header Recuperar -->
+        <div class="w-full text-left mb-8">
+          <h3 class="font-mono-custom text-3xl font-semibold text-[#0a1931] mb-2">
+            Recuperar contrasena
+          </h3>
+          <p class="font-mono-custom text-xs text-gray-500">
+            Ingresa tu correo para recibir el enlace de recuperacion.
+          </p>
         </div>
 
-        <div>
-          <label for="password" class="block text-xs font-semibold text-ink-700 mb-1.5">Contraseña</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-            autocomplete="current-password"
-            [ngModel]="password()"
-            (ngModelChange)="password.set($event)"
-            placeholder="••••••••••••"
-            class="w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-sm text-ink-900 placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-brand-700/30 focus:border-brand-700"
-          />
+        <app-forgot-password (volver)="volverALogin()" />
+
+      } @else {
+        <!-- Header Login -->
+        <div class="w-full text-left mb-8">
+          <h3 class="font-mono-custom text-3xl font-semibold text-[#0a1931] mb-2">
+            Bienvenido de vuelta
+          </h3>
+          <p class="font-mono-custom text-xs text-gray-500">
+            Ingresa tus credenciales para continuar a tu panel.
+          </p>
         </div>
 
-        @if (errorMsg()) {
-          <p class="text-sm text-red-600" role="alert">{{ errorMsg() }}</p>
-        }
+        <!-- Form Login -->
+        <div class="w-full bg-[#f4f7fa] rounded-2xl p-6 mb-6">
+          <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="space-y-5">
+            
+            <div>
+              <label for="correo" class="block font-mono-custom text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
+                USUARIO
+              </label>
+              <div class="relative w-full">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-700"></span>
+                </span>
+                <input 
+                  id="correo"
+                  name="correo"
+                  type="text"
+                  required
+                  autocomplete="username"
+                  [ngModel]="correo()"
+                  (ngModelChange)="correo.set($event)"
+                  placeholder="Ingresa tu nombre de usuario"
+                  class="w-full pl-8 pr-4 py-3 bg-white border border-gray-200 rounded-lg text-xs font-mono-custom text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0a1931] focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
 
-        <button
-          type="submit"
-          [disabled]="cargando() || loginForm.invalid"
-          class="w-full flex items-center justify-center gap-2 rounded-lg bg-brand-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-800 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {{ cargando() ? "Ingresando..." : "Entrar al campus" }}
-          @if (!cargando()) {
-            <span aria-hidden="true">›</span>
-          }
-        </button>
-      </form>
+            <div>
+              <label for="password" class="block font-mono-custom text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">
+                CONTRASENA
+              </label>
+              <div class="relative w-full">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-700"></span>
+                </span>
+                <input 
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  autocomplete="current-password"
+                  [ngModel]="password()"
+                  (ngModelChange)="password.set($event)"
+                  placeholder="Ingresa tu contrasena"
+                  class="w-full pl-8 pr-4 py-3 bg-white border border-gray-200 rounded-lg text-xs font-mono-custom text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0a1931] focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
 
-      <p class="mt-8 text-center text-xs text-ink-300">Al continuar aceptas los términos de uso del portal</p>
+            <div class="text-right">
+              <button 
+                type="button"
+                (click)="mostrarRecuperarContrasena()"
+                class="font-mono-custom text-xs text-blue-700 hover:underline font-medium bg-transparent border-none cursor-pointer">
+                Olvidaste tu contrasena?
+              </button>
+            </div>
+
+            @if (errorMsg()) {
+              <p class="text-sm text-red-600 font-mono-custom" role="alert">{{ errorMsg() }}</p>
+            }
+
+            <button 
+              type="submit" 
+              [disabled]="cargando() || loginForm.invalid"
+              class="w-full bg-[#0a1931] hover:bg-blue-950 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono-custom text-sm font-semibold py-3 px-4 rounded-lg transition-colors duration-200 shadow-md">
+              {{ cargando() ? 'Ingresando...' : 'Ingresar' }}
+            </button>
+          </form>
+        </div>
+
+      }
+
+      <!-- Feature badges (solo en login) -->
+      @if (!mostrarRecuperar()) {
+        <div class="flex flex-wrap justify-center gap-2 w-full">
+          <div class="flex items-center gap-2 border border-gray-200 rounded-full px-3 py-1 bg-white">
+            <span class="w-2 h-2 rounded-full bg-blue-700"></span>
+            <span class="font-mono-custom text-[11px] text-gray-600">Diseno simple</span>
+          </div>
+          <div class="flex items-center gap-2 border border-gray-200 rounded-full px-3 py-1 bg-white">
+            <span class="w-2 h-2 rounded-full bg-blue-700"></span>
+            <span class="font-mono-custom text-[11px] text-gray-600">Seguro</span>
+          </div>
+          <div class="flex items-center gap-2 border border-gray-200 rounded-full px-3 py-1 bg-white">
+            <span class="w-2 h-2 rounded-full bg-blue-700"></span>
+            <span class="font-mono-custom text-[11px] text-gray-600">Soporte 24/7</span>
+          </div>
+        </div>
+      }
+
     </div>
   </div>
+
 </div>
