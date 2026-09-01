@@ -151,3 +151,5 @@ Desktop.ini
 
 .history/
 .sass-cache/
+# Configuracion local de herramientas de IA (Claude Code)
+.claude/
