@@ -1,32 +1,207 @@
-@if (auth.usuario(); as usuario) {
-  <h2 class="text-lg font-bold text-ink-900 mb-1">Hola, {{ usuario.nombre.split(" ")[0] }} 👋</h2>
-  <p class="text-sm text-ink-500 mb-6">Este es el resumen de tu semana académica.</p>
-}
+<section class="flex flex-col gap-4 md:gap-6">
 
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-  <div class="rounded-xl border border-line bg-white px-5 py-4">
-    <p class="text-[11px] font-semibold tracking-wider text-ink-300 uppercase mb-1">Promedio general</p>
-    <p class="text-2xl font-bold text-brand-900">{{ academico.calificaciones.value().promedio }}/10</p>
-  </div>
-  <div class="rounded-xl border border-line bg-white px-5 py-4">
-    <p class="text-[11px] font-semibold tracking-wider text-ink-300 uppercase mb-1">Cursos activos</p>
-    <p class="text-2xl font-bold text-ink-900">{{ totalCursos() }}</p>
-  </div>
-  <div class="rounded-xl border border-line bg-white px-5 py-4">
-    <p class="text-[11px] font-semibold tracking-wider text-ink-300 uppercase mb-1">Próxima clase</p>
-    @if (proximaClase(); as clase) {
-      <p class="text-sm font-bold text-ink-900">{{ clase.curso }}</p>
-      <p class="text-xs text-ink-500">{{ clase.dia }} · {{ clase.horaInicio }}</p>
-    } @else {
-      <p class="text-sm text-ink-500">Sin clases próximas</p>
-    }
-  </div>
-</div>
+  <!-- WELCOME CARD -->
+  <section class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 flex flex-col gap-4 md:flex-row md:justify-between md:items-center shadow-sm">
+    <div class="flex items-start gap-4">
+      <div class="bg-yellow-50 text-yellow-500 w-10 h-10 rounded-lg flex items-center justify-center text-base shrink-0" [title]="saludo()">
+        <i class="fa-solid fa-sun"></i>
+      </div>
+      <div>
+        <h2 class="text-xl md:text-2xl font-bold text-slate-800 mb-1">{{ saludo() }}, {{ nombreUsuario() }}</h2>
+        <p class="text-slate-500 text-sm font-medium">
+          Tienes {{ clases().length }} clases y {{ tareasPendientes }} tareas para hoy. Tu proxima clase empieza pronto.
+        </p>
+      </div>
+    </div>
+    <div
+      class="bg-aura-sidebar text-white rounded-2xl p-4 w-full md:w-48 shadow-lg shrink-0"
+      [title]="'Hoy es ' + nombreDia + ' ' + hoy.getDate() + ' de ' + mesLargo"
+    >
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-2 text-xs text-slate-300 font-medium">
+          <i class="fa-regular fa-calendar"></i> HOY
+        </div>
+        <h3 class="text-lg font-bold">{{ nombreDia }}</h3>
+        <p class="text-xs text-slate-400">{{ hoy.getDate() }} de {{ mesLargo }}</p>
+      </div>
+    </div>
+  </section>
 
-<div class="rounded-xl border border-dashed border-line bg-white px-6 py-8 text-center">
-  <p class="text-sm text-ink-500">
-    Usa el menú de la izquierda para ver el detalle de tus
-    <span class="font-semibold text-ink-700">notas</span> o tu
-    <span class="font-semibold text-ink-700">horario</span>.
-  </p>
-</div>
+  <!-- STATS CARDS -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+    <!-- Promedio -->
+    <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm flex flex-col justify-between relative overflow-hidden">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="bg-blue-50 text-blue-500 w-10 h-10 rounded-xl flex items-center justify-center shrink-0" title="Promedio general del semestre">
+          <i class="fa-regular fa-user" aria-hidden="true"></i>
+        </div>
+        <span class="text-xs font-bold text-slate-400 tracking-wider">PROMEDIO GENERAL</span>
+      </div>
+      <div>
+        <span class="text-3xl font-bold text-slate-800">{{ promedio() }}</span>
+        <p class="text-xs text-slate-400 mt-1">Indicador del semestre</p>
+      </div>
+      <div class="absolute bottom-4 right-4 md:bottom-5 md:right-5 text-green-500 flex items-center gap-1 text-sm font-bold" title="Subio 0.3 respecto al periodo anterior">
+        <i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> 0.3
+      </div>
+    </div>
+
+    <!-- Cursos activos -->
+    <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm flex flex-col justify-between relative">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="bg-blue-50 text-blue-500 w-10 h-10 rounded-xl flex items-center justify-center shrink-0" title="Cursos en los que estas matriculado">
+          <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+        </div>
+        <span class="text-xs font-bold text-slate-400 tracking-wider">CURSOS ACTIVOS</span>
+      </div>
+      <div>
+        <span class="text-3xl font-bold text-slate-800">{{ totalCursos() }}</span>
+        <p class="text-xs text-slate-400 mt-1">Distribuidas en 2 labs</p>
+      </div>
+      <div class="absolute bottom-4 right-4 md:bottom-5 md:right-5 text-green-500 flex items-center gap-1 text-sm font-bold" title="Subio 0.3 respecto al periodo anterior">
+        <i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> 0.3
+      </div>
+    </div>
+
+    <!-- Tareas pendientes -->
+    <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm flex flex-col justify-between relative sm:col-span-2 lg:col-span-1">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="bg-blue-50 text-blue-500 w-10 h-10 rounded-xl flex items-center justify-center shrink-0" title="Tareas que vencen esta semana">
+          <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+        </div>
+        <span class="text-xs font-bold text-slate-400 tracking-wider">TAREAS PENDIENTES</span>
+      </div>
+      <div>
+        <span class="text-3xl font-bold text-slate-800">{{ tareasPendientes }}</span>
+        <p class="text-xs text-slate-400 mt-1">Vencen esta semana</p>
+      </div>
+      <div class="absolute bottom-4 right-4 md:bottom-5 md:right-5 text-green-500 flex items-center gap-1 text-sm font-bold" title="Subio 0.3 respecto al periodo anterior">
+        <i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> 0.3
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM GRID -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+
+    <!-- Schedule (full width en móvil/tablet, 2/3 en desktop) -->
+    <div class="lg:col-span-2 bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm">
+      <div class="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-end mb-4 border-b pb-3">
+        <div>
+          <h3 class="text-lg font-bold flex items-center gap-2">
+            <i class="fa-solid fa-bars-staggered text-blue-500" aria-hidden="true"></i> Hoy - {{ nombreDia }}
+          </h3>
+          <p class="text-sm text-slate-400">Tu horario del dia en curso</p>
+        </div>
+        <a routerLink="/horario" title="Ver el horario completo de la semana" class="text-sm font-semibold text-blue-600 hover:underline flex items-center gap-1 self-start sm:self-auto">
+          Ver todo <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      @if (clases().length === 0) {
+        <div class="rounded-2xl border border-dashed border-slate-200 px-6 py-10 text-center">
+          <p class="text-sm text-slate-500">No tienes clases programadas para hoy.</p>
+        </div>
+      } @else {
+        <div class="space-y-2">
+          @for (clase of clases(); track clase.curso + clase.horaInicio; let i = $index; let first = $first) {
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 rounded-2xl hover:bg-slate-50 transition"
+                 [title]="clase.curso + ' · ' + clase.horaInicio + ' a ' + clase.horaFin + ' · ' + clase.profesor + ' · ' + clase.categoria">
+              <div class="flex items-center gap-3 sm:gap-6 min-w-0">
+                <div class="text-right shrink-0">
+                  <p class="text-sm font-bold text-slate-800">{{ clase.horaInicio }}</p>
+                  <p class="text-xs text-slate-400">{{ clase.horaFin }}</p>
+                </div>
+                <div class="hidden sm:block w-px self-stretch bg-slate-200"></div>
+                <div [class]="avatarClase(i).bg + ' ' + avatarClase(i).text + ' w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm shrink-0'">
+                  {{ inicialesCurso(clase.curso) }}
+                </div>
+                <div class="min-w-0">
+                  <h4 class="font-bold text-slate-800 truncate">{{ clase.curso }}</h4>
+                  <p class="text-xs text-slate-500 truncate">{{ clase.profesor }} · {{ clase.categoria }}</p>
+                </div>
+              </div>
+              @if (first) {
+                <div class="bg-yellow-50 text-yellow-600 px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 shrink-0 self-start sm:self-auto" title="Es tu proxima clase del dia">
+                  <i class="fa-regular fa-clock" aria-hidden="true"></i> Proxima
+                </div>
+              } @else {
+                <div class="bg-green-50 text-green-600 px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-2 shrink-0 self-start sm:self-auto" title="Clase programada para hoy">
+                  <i class="fa-solid fa-check" aria-hidden="true"></i> Programada
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Right Column Widgets -->
+    <div class="flex flex-col gap-4 md:gap-6">
+      <!-- Proxima Clase Card -->
+      @if (proximaClase(); as proxima) {
+        <div class="bg-aura-sidebar rounded-xl md:rounded-2xl p-4 md:p-5 text-white shadow-md relative overflow-hidden">
+          <div class="flex justify-between items-center mb-4 gap-2">
+            <div class="flex items-center gap-2 text-yellow-500 text-xs font-bold tracking-wider">
+              <i class="fa-solid fa-bolt" aria-hidden="true"></i> PROXIMA CLASE
+            </div>
+            <div class="bg-aura-sidebar-soft px-3 py-1 rounded-full text-[10px] font-bold flex items-center gap-1.5 border border-aura-sidebar-border shrink-0" title="La clase esta en curso">
+              <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> EN VIVO
+            </div>
+          </div>
+          <h3 class="text-lg md:text-xl font-bold mb-3 line-clamp-2">{{ proxima.curso }}</h3>
+          <div class="space-y-2 text-sm text-slate-300 mb-6">
+            <p class="flex items-center gap-3">
+              <i class="fa-regular fa-clock w-4" title="Horario" aria-hidden="true"></i> {{ proxima.horaInicio }} - {{ proxima.horaFin }}
+            </p>
+            <p class="flex items-start gap-3">
+              <i class="fa-solid fa-location-dot w-4 mt-1" title="Lugar y docente" aria-hidden="true"></i>
+              <span>{{ proxima.categoria }}<br /><span class="text-xs">{{ proxima.profesor }}</span></span>
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled
+            title="Aula virtual · disponible proximamente"
+            class="w-full bg-aura-primary/50 transition py-2.5 rounded-lg text-sm font-bold cursor-not-allowed"
+          >
+            Ingresar a la clase
+          </button>
+        </div>
+      }
+
+      <!-- Resumen Rapido -->
+      <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm">
+        <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-4">
+          <i class="fa-solid fa-bullseye text-blue-500" aria-hidden="true"></i> Resumen rapido
+        </h4>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center text-sm" title="Porcentaje de asistencia acumulada del semestre">
+            <span class="text-slate-500 flex items-center gap-3">
+              <i class="fa-solid fa-check text-slate-300 w-4" aria-hidden="true"></i> Asistencia
+            </span>
+            <span class="font-bold text-slate-800">{{ asistencia }}%</span>
+          </div>
+          <div class="flex justify-between items-center text-sm" title="Creditos matriculados este semestre">
+            <span class="text-slate-500 flex items-center gap-3">
+              <i class="fa-regular fa-star text-slate-300 w-4" aria-hidden="true"></i> Creditos
+            </span>
+            <span class="font-bold text-slate-800">{{ creditos }}</span>
+          </div>
+          <div class="flex justify-between items-center text-sm" title="Tu posicion dentro de la carrera">
+            <span class="text-slate-500 flex items-center gap-3">
+              <i class="fa-solid fa-arrow-trend-up text-slate-300 w-4" aria-hidden="true"></i> Ranking
+            </span>
+            <span class="font-bold text-slate-800">{{ ranking }}</span>
+          </div>
+          <div class="flex justify-between items-center text-sm pt-2 border-t border-slate-100" title="Fecha de la proxima entrega">
+            <span class="text-slate-500 flex items-center gap-3">
+              <i class="fa-regular fa-file-lines text-slate-300 w-4" aria-hidden="true"></i> Proxima tarea
+            </span>
+            <span class="font-bold text-orange-500">Vie 28</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>

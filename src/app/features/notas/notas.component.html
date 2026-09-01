@@ -1,42 +1,187 @@
-<div class="flex items-start justify-between mb-5">
-  <div>
-    <p class="text-[11px] font-semibold tracking-wider text-ink-300 uppercase mb-1">Periodo académico 2026</p>
-    <h2 class="text-lg font-bold text-ink-900">Tu progreso académico</h2>
-  </div>
+<section class="flex flex-col gap-4 md:gap-6">
 
-  <div class="rounded-xl bg-brand-100 px-5 py-3 text-right">
-    <p class="text-[11px] font-semibold tracking-wider text-brand-700 uppercase">Promedio</p>
-    <p class="text-xl font-bold text-brand-900">{{ academico.calificaciones.value().promedio }}/10</p>
-  </div>
-</div>
-
-<div class="rounded-xl border border-line bg-white overflow-hidden">
-  <div class="grid grid-cols-[1fr_auto] gap-4 px-6 py-3 border-b border-line">
-    <span class="text-[11px] font-semibold tracking-wider text-ink-300 uppercase">Asignatura</span>
-    <span class="text-[11px] font-semibold tracking-wider text-ink-300 uppercase">Calificación</span>
-  </div>
-
-  @if (academico.calificaciones.isLoading()) {
-    <p class="px-6 py-6 text-sm text-ink-500">Cargando calificaciones...</p>
-  }
-
-  @if (academico.calificaciones.error()) {
-    <p class="px-6 py-6 text-sm text-red-600">
-      No se pudieron cargar las calificaciones. Verifica que el mock API esté corriendo.
-    </p>
-  }
-
-  @for (item of academico.calificaciones.value().calificaciones; track item.curso) {
-    <div class="grid grid-cols-[1fr_auto] gap-4 items-center px-6 py-4 border-b border-line last:border-b-0">
-      <div>
-        <p class="text-sm font-bold text-ink-900">{{ item.curso }}</p>
-        <p class="text-xs text-ink-500">{{ item.profesor }}</p>
+  <!-- HEADER + RESUMEN DEL SEMESTRE (misma fila desde lg, apilado antes) -->
+  <div class="flex flex-col lg:flex-row lg:items-center gap-4 md:gap-6">
+    <header class="flex items-start gap-4 lg:shrink-0">
+      <div class="bg-amber-50 text-amber-500 w-10 h-10 rounded-lg flex items-center justify-center text-base shrink-0" title="Calificaciones del semestre">
+        <i class="fa-solid fa-award" aria-hidden="true"></i>
       </div>
-      <span class="text-sm font-bold text-ink-900 justify-self-end">{{ item.nota }}</span>
+      <div>
+        <h1 class="text-xl md:text-2xl font-bold text-slate-800 mb-1">Calificaciones</h1>
+        <p class="text-slate-500 text-sm font-medium">Revisa tus calificaciones y tu desempeño académico.</p>
+      </div>
+    </header>
+
+    <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm lg:flex-1">
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <p class="flex items-center gap-2 text-[11px] font-bold text-slate-400 tracking-wider">
+          <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+          RESUMEN DEL SEMESTRE
+        </p>
+
+        @if (enRiesgo()) {
+          <span
+            class="rounded-full bg-red-50 text-red-600 px-3 py-1 text-[11px] font-bold"
+            [title]="enRiesgo() + ' materia(s) por debajo de 7'"
+          >
+            {{ enRiesgo() }} en riesgo
+          </span>
+        } @else {
+          <span
+            class="rounded-full bg-emerald-50 text-emerald-600 px-3 py-1 text-[11px] font-bold"
+            title="Ninguna materia por debajo de 7"
+          >
+            Todo al día
+          </span>
+        }
+      </div>
+
+      <div class="grid grid-cols-3 gap-2">
+        <div
+          class="flex flex-col items-center gap-0.5 rounded-xl border border-aura-primary bg-aura-primary text-white shadow-sm px-2 py-2.5"
+          title="Promedio de todas tus materias del semestre"
+        >
+          <span class="text-[11px] font-semibold tracking-wide text-white/80">PROMEDIO</span>
+          <span class="text-lg font-bold leading-none">{{ promedio() }}</span>
+          <span class="text-[10px] font-medium text-white/70">sobre 10</span>
+        </div>
+
+        <div
+          class="flex flex-col items-center gap-0.5 rounded-xl border border-slate-200 bg-white px-2 py-2.5"
+          title="Materias matriculadas este semestre"
+        >
+          <span class="text-[11px] font-semibold tracking-wide text-slate-400">MATERIAS</span>
+          <span class="text-lg font-bold leading-none text-slate-700">{{ totalMaterias() }}</span>
+          <span class="text-[10px] font-medium text-slate-400">matriculadas</span>
+        </div>
+
+        <div
+          class="flex flex-col items-center gap-0.5 rounded-xl border border-slate-200 bg-white px-2 py-2.5"
+          [title]="aprobadas() + ' de ' + totalMaterias() + ' materias con nota 7 o mayor'"
+        >
+          <span class="text-[11px] font-semibold tracking-wide text-slate-400">APROBADAS</span>
+          <span class="text-lg font-bold leading-none text-slate-700">{{ aprobadas() }}</span>
+          <span class="text-[10px] font-medium text-slate-400">de {{ totalMaterias() }}</span>
+        </div>
+      </div>
     </div>
-  } @empty {
-    @if (!academico.calificaciones.isLoading()) {
-      <p class="px-6 py-8 text-sm text-ink-500 text-center">Aún no tienes calificaciones registradas.</p>
+  </div>
+
+  <!-- MATERIAS DEL SEMESTRE -->
+  <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-6 border-b pb-4">
+      <div>
+        <h3 class="text-lg font-bold flex items-center gap-2">
+          <i class="fa-solid fa-bars-staggered text-blue-500" aria-hidden="true"></i> Materias del semestre
+        </h3>
+        <p class="text-sm text-slate-400">{{ calificaciones().length }} materia(s) matriculada(s)</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex items-center gap-1 rounded-full bg-slate-100 p-1 text-xs font-semibold">
+          <button
+            type="button"
+            (click)="cambiarOrden('nombre')"
+            title="Ordenar las materias alfabéticamente"
+            [attr.aria-pressed]="orden() === 'nombre'"
+            class="px-3 py-1.5 rounded-full transition"
+            [class.bg-white]="orden() === 'nombre'"
+            [class.shadow-sm]="orden() === 'nombre'"
+            [class.text-slate-800]="orden() === 'nombre'"
+            [class.text-slate-500]="orden() !== 'nombre'"
+          >
+            Nombre
+          </button>
+          <button
+            type="button"
+            (click)="cambiarOrden('nota-desc')"
+            title="Ordenar de la nota más alta a la más baja"
+            [attr.aria-pressed]="orden() === 'nota-desc'"
+            class="px-3 py-1.5 rounded-full transition"
+            [class.bg-white]="orden() === 'nota-desc'"
+            [class.shadow-sm]="orden() === 'nota-desc'"
+            [class.text-slate-800]="orden() === 'nota-desc'"
+            [class.text-slate-500]="orden() !== 'nota-desc'"
+          >
+            Nota ↓
+          </button>
+          <button
+            type="button"
+            (click)="cambiarOrden('nota-asc')"
+            title="Ordenar de la nota más baja a la más alta"
+            [attr.aria-pressed]="orden() === 'nota-asc'"
+            class="px-3 py-1.5 rounded-full transition"
+            [class.bg-white]="orden() === 'nota-asc'"
+            [class.shadow-sm]="orden() === 'nota-asc'"
+            [class.text-slate-800]="orden() === 'nota-asc'"
+            [class.text-slate-500]="orden() !== 'nota-asc'"
+          >
+            Nota ↑
+          </button>
+        </div>
+
+        <button
+          type="button"
+          (click)="exportarCalificaciones()"
+          title="Descargar tus calificaciones en formato CSV"
+          class="flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+        >
+          <i class="fa-solid fa-download" aria-hidden="true"></i> Exportar
+        </button>
+      </div>
+    </div>
+
+    @if (academico.calificaciones.isLoading()) {
+      <p class="text-sm text-slate-500">Cargando calificaciones...</p>
     }
-  }
-</div>
+
+    @if (academico.calificaciones.error()) {
+      <p class="text-sm text-red-600">
+        No se pudieron cargar las calificaciones. Verifica que el mock API esté corriendo.
+      </p>
+    }
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      @for (item of calificacionesOrdenadas(); track item.curso) {
+        <div
+          class="rounded-2xl border border-slate-200 p-4 flex flex-col gap-3"
+          [title]="item.curso + ' · ' + item.profesor + ' · nota ' + item.nota + '/10'"
+        >
+          <div class="flex items-center gap-3">
+            <div [class]="avatarCurso(item.curso).bg + ' ' + avatarCurso(item.curso).text + ' w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0'">
+              {{ inicialesCurso(item.curso) }}
+            </div>
+            <div class="min-w-0">
+              <p class="font-bold text-slate-800 truncate">{{ item.curso }}</p>
+              <p class="text-xs text-slate-500 truncate">{{ item.profesor }}</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+              <span>Rendimiento general</span>
+              <span class="font-bold text-slate-700">{{ item.nota }}/10</span>
+            </div>
+            <div class="h-2 rounded-full bg-slate-100 overflow-hidden" [title]="item.nota * 10 + '% de rendimiento'">
+              <div class="h-full rounded-full bg-aura-primary" [style.width.%]="item.nota * 10"></div>
+            </div>
+          </div>
+
+          <span
+            class="self-start px-3 py-1 rounded-full text-xs font-bold"
+            [class]="estadoNota(item.nota).bg + ' ' + estadoNota(item.nota).text"
+            [title]="'Estado de la materia: ' + estadoNota(item.nota).texto"
+          >
+            {{ estadoNota(item.nota).texto }}
+          </span>
+        </div>
+      } @empty {
+        @if (!academico.calificaciones.isLoading()) {
+          <p class="sm:col-span-2 xl:col-span-3 text-sm text-slate-500 text-center py-8">
+            Aún no tienes calificaciones registradas.
+          </p>
+        }
+      }
+    </div>
+  </div>
+</section>

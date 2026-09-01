@@ -1,8 +1,9 @@
-import { Component, inject } from "@angular/core";
-import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from "@angular/router";
+import { Component, inject, signal } from "@angular/core";
+import { RouterOutlet, Router, NavigationEnd } from "@angular/router";
 import { filter, map, startWith } from "rxjs";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { AuthService } from "../../core/services/auth.service";
+import { SidebarComponent } from "../sidebar/sidebar.component";
+import { NavbarComponent } from "../navbar/navbar.component";
 
 interface RouteHeaderData {
   breadcrumb: string;
@@ -12,12 +13,17 @@ interface RouteHeaderData {
 @Component({
   selector: "app-layout",
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, SidebarComponent, NavbarComponent],
   templateUrl: "./layout.component.html",
 })
 export class LayoutComponent {
-  protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  /**
+   * Estado del drawer móvil. Se cierra automáticamente al navegar para
+   * evitar que el sidebar tape la pantalla al cambiar de ruta en móvil.
+   */
+  protected readonly sidebarOpen = signal(false);
 
   /**
    * Lee { breadcrumb, title } de la ruta hija activa para el header.
@@ -47,8 +53,18 @@ export class LayoutComponent {
     { initialValue: { breadcrumb: "", title: "" } }
   );
 
-  onLogout(): void {
-    this.auth.logout();
-    this.router.navigate(["/login"]);
+  constructor() {
+    // Cierra el drawer en cada navegación para que no tape la nueva vista en móvil.
+    this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe(() => this.sidebarOpen.set(false));
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update((v) => !v);
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen.set(false);
   }
 }

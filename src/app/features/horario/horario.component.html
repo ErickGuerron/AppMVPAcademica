@@ -1,74 +1,298 @@
-<div class="flex items-center justify-between mb-1">
-  <p class="text-[11px] font-semibold tracking-wider text-ink-300 uppercase">Semana del 24 al 28 de agosto</p>
-</div>
+<section class="flex flex-col gap-4 md:gap-6">
 
-<div class="flex items-center justify-between mb-5">
-  <h2 class="text-lg font-bold text-ink-900">Tus clases de la semana</h2>
-
-  <button
-    type="button"
-    (click)="exportarHorario()"
-    class="flex items-center gap-2 rounded-full border border-brand-700 px-4 py-2 text-sm font-semibold text-brand-800 hover:bg-brand-100"
-  >
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.8" class="w-4 h-4">
-      <rect x="4" y="5.5" width="16" height="14" rx="2" />
-      <path stroke-linecap="round" d="M8 3.5v3.5M16 3.5v3.5M4 10h16M12 13v4m-2-2 2 2 2-2" />
-    </svg>
-    Exportar horario
-  </button>
-</div>
-
-<div class="flex gap-3 mb-6">
-  @for (dia of dias; track dia.abbr) {
-    <button
-      type="button"
-      (click)="seleccionarDia(dia.abbr)"
-      class="flex flex-col items-center justify-center rounded-xl w-16 h-16 border transition"
-      [class.bg-brand-800]="diaSeleccionado() === dia.abbr"
-      [class.text-white]="diaSeleccionado() === dia.abbr"
-      [class.border-brand-800]="diaSeleccionado() === dia.abbr"
-      [class.bg-white]="diaSeleccionado() !== dia.abbr"
-      [class.text-ink-700]="diaSeleccionado() !== dia.abbr"
-      [class.border-line]="diaSeleccionado() !== dia.abbr"
-    >
-      <span class="text-[11px] font-semibold">{{ dia.abbr }}</span>
-      <span class="text-base font-bold">{{ dia.fecha }}</span>
-    </button>
-  }
-</div>
-
-<div class="space-y-3">
-  @if (academico.horario.isLoading()) {
-    <p class="text-sm text-ink-500">Cargando horario...</p>
-  }
-
-  @if (academico.horario.error()) {
-    <p class="text-sm text-red-600">No se pudo cargar el horario. Verifica que el mock API esté corriendo.</p>
-  }
-
-  @for (clase of clasesDelDia(); track clase.horaInicio) {
-    <div class="flex items-center gap-5 rounded-xl border border-line bg-white px-5 py-4">
-      <div class="w-14 text-right shrink-0">
-        <p class="text-sm font-bold text-ink-900">{{ clase.horaInicio }}</p>
-        <p class="text-xs text-ink-400">{{ clase.horaFin }}</p>
+  <!-- HEADER + TIRA DE DIAS (misma fila desde lg, apilado antes) -->
+  <div class="flex flex-col lg:flex-row lg:items-center gap-4 md:gap-6">
+    <header class="flex items-start gap-4 lg:shrink-0">
+      <div class="bg-blue-50 text-blue-500 w-10 h-10 rounded-lg flex items-center justify-center text-base shrink-0" title="Horario semanal">
+        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
       </div>
-      <div class="w-px self-stretch bg-line"></div>
-      <div class="flex-1 min-w-0">
-        <p class="text-xs font-semibold uppercase tracking-wide" [class]="claseCategoriaClase(clase.categoria)">
-          {{ clase.categoria }}
+      <div>
+        <h1 class="text-xl md:text-2xl font-bold text-slate-800 mb-1">Horarios</h1>
+        <p class="text-slate-500 text-sm font-medium">Consulta tus clases por cada día de la semana.</p>
+      </div>
+    </header>
+
+    <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm lg:flex-1">
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <p class="flex items-center gap-2 text-[11px] font-bold text-slate-400 tracking-wider">
+          <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+          SEMANA DEL 24 AL 28 DE AGOSTO
         </p>
-        <p class="text-sm font-bold text-ink-900">{{ clase.curso }}</p>
-        <p class="text-xs text-ink-500">{{ clase.profesor }}</p>
+
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            (click)="irAHoy()"
+            [disabled]="!hoyAbbr"
+            [title]="hoyAbbr ? 'Ir al día de hoy' : 'Hoy es fin de semana: no hay clases programadas'"
+            class="rounded-full px-3 py-1 text-[11px] font-bold tracking-wide transition
+                   text-aura-primary hover:bg-blue-50
+                   disabled:text-slate-300 disabled:hover:bg-transparent disabled:cursor-not-allowed"
+          >
+            HOY
+          </button>
+          <button
+            type="button"
+            disabled
+            aria-label="Semana anterior"
+            title="Semana anterior · disponible próximamente"
+            class="w-7 h-7 grid place-items-center rounded-full text-slate-300 cursor-not-allowed"
+          >
+            <i class="fa-solid fa-chevron-left text-xs" aria-hidden="true"></i>
+          </button>
+          <button
+            type="button"
+            disabled
+            aria-label="Semana siguiente"
+            title="Semana siguiente · disponible próximamente"
+            class="w-7 h-7 grid place-items-center rounded-full text-slate-300 cursor-not-allowed"
+          >
+            <i class="fa-solid fa-chevron-right text-xs" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
-      <span class="text-ink-300" aria-hidden="true">›</span>
+
+      <div class="grid grid-cols-5 gap-2" role="group" aria-label="Días de la semana">
+        @for (dia of dias; track dia.abbr) {
+          @let seleccionado = diaSeleccionado() === dia.abbr;
+          @let esHoy = hoyAbbr === dia.abbr;
+          @let clases = clasesPorDia()[dia.abbr];
+
+          <button
+            type="button"
+            (click)="seleccionarDia(dia.abbr)"
+            [title]="dia.nombreLargo + ' ' + dia.fecha + ' de Agosto · ' + (clases ? clases + ' clase(s)' : 'sin clases')"
+            [attr.aria-pressed]="seleccionado"
+            class="group flex flex-col items-center gap-0.5 rounded-xl border px-2 py-2.5 transition"
+            [class]="seleccionado
+              ? 'bg-aura-primary border-aura-primary text-white shadow-sm'
+              : 'bg-white border-slate-200 text-slate-600 hover:border-aura-primary/40 hover:bg-slate-50'"
+          >
+            <span
+              class="text-[11px] font-semibold tracking-wide"
+              [class]="seleccionado ? 'text-white/80' : 'text-slate-400'"
+            >
+              {{ dia.abbr }}
+            </span>
+
+            <span
+              class="text-lg font-bold leading-none"
+              [class]="seleccionado ? 'text-white' : esHoy ? 'text-aura-primary' : 'text-slate-700'"
+            >
+              {{ dia.fecha }}
+            </span>
+
+            <!-- Marcador de carga del día: puntos = clases, guion = día libre -->
+            <span class="flex items-center gap-1 h-1.5 mt-1" aria-hidden="true">
+              @if (clases) {
+                @for (punto of marcadores(clases); track punto) {
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    [class]="seleccionado ? 'bg-white/70' : 'bg-aura-primary/40'"
+                  ></span>
+                }
+              } @else {
+                <span class="w-3 h-px rounded-full" [class]="seleccionado ? 'bg-white/40' : 'bg-slate-200'"></span>
+              }
+            </span>
+
+            <span
+              class="text-[10px] font-medium"
+              [class]="seleccionado ? 'text-white/70' : esHoy ? 'text-aura-primary' : 'text-slate-400'"
+            >
+              {{ esHoy ? 'Hoy' : clases ? clases + (clases === 1 ? ' clase' : ' clases') : 'Libre' }}
+            </span>
+          </button>
+        }
+      </div>
     </div>
-  } @empty {
-    @if (!academico.horario.isLoading()) {
-      <div class="rounded-xl border border-dashed border-line bg-white px-5 py-8 text-center">
-        <p class="text-sm font-medium text-ink-700">No tienes clases este día.</p>
-        <p class="text-xs text-ink-400 mt-1">Elige otro día de la semana para ver tu agenda.</p>
+  </div>
+
+  <!-- BOTTOM GRID -->
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+
+    <!-- MATERIAS DEL DIA -->
+    <div class="lg:col-span-2 bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm">
+      <div class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-end mb-4">
+        <div>
+          <h3 class="text-lg font-bold flex items-center gap-2">
+            <i class="fa-solid fa-bars-staggered text-blue-500" aria-hidden="true"></i> Materias del día
+          </h3>
+          <p class="text-sm text-slate-400">
+            {{ diaActual().nombreLargo }} {{ diaActual().fecha }} de Agosto · {{ clasesDelDia().length }} clase(s) programada(s)
+          </p>
+        </div>
+        <button
+          type="button"
+          (click)="exportarHorario()"
+          title="Descargar el horario del día en formato CSV"
+          class="flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 self-start sm:self-auto"
+        >
+          <i class="fa-solid fa-download" aria-hidden="true"></i> Exportar
+        </button>
       </div>
-    }
-  }
-</div>
+
+      <div class="flex items-center gap-1 rounded-full bg-slate-100 p-1 text-xs font-semibold w-fit mb-4">
+        <button
+          type="button"
+          (click)="seleccionarFiltro('todas')"
+          title="Ver todas las clases del día"
+          [attr.aria-pressed]="filtro() === 'todas'"
+          class="px-3.5 py-1.5 rounded-full transition"
+          [class.bg-aura-primary]="filtro() === 'todas'"
+          [class.text-white]="filtro() === 'todas'"
+          [class.text-slate-500]="filtro() !== 'todas'"
+        >
+          Todas
+        </button>
+        <button
+          type="button"
+          (click)="seleccionarFiltro('presencial')"
+          title="Ver solo las clases presenciales"
+          [attr.aria-pressed]="filtro() === 'presencial'"
+          class="px-3.5 py-1.5 rounded-full transition"
+          [class.bg-aura-primary]="filtro() === 'presencial'"
+          [class.text-white]="filtro() === 'presencial'"
+          [class.text-slate-500]="filtro() !== 'presencial'"
+        >
+          Presencial
+        </button>
+        <button
+          type="button"
+          (click)="seleccionarFiltro('virtual')"
+          title="Ver solo las clases virtuales"
+          [attr.aria-pressed]="filtro() === 'virtual'"
+          class="px-3.5 py-1.5 rounded-full transition"
+          [class.bg-aura-primary]="filtro() === 'virtual'"
+          [class.text-white]="filtro() === 'virtual'"
+          [class.text-slate-500]="filtro() !== 'virtual'"
+        >
+          Virtual
+        </button>
+      </div>
+
+      <div class="border-t border-slate-100 pt-2"></div>
+
+      @if (academico.horario.isLoading()) {
+        <p class="text-sm text-slate-500">Cargando horario...</p>
+      }
+
+      @if (academico.horario.error()) {
+        <p class="text-sm text-red-600">No se pudo cargar el horario. Verifica que el mock API esté corriendo.</p>
+      }
+
+      <div class="space-y-2">
+        @for (clase of clasesDelDia(); track clase.horaInicio + clase.curso) {
+          <div
+            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 p-3 rounded-2xl hover:bg-slate-50 transition"
+            [title]="clase.curso + ' · ' + clase.horaInicio + ' a ' + clase.horaFin + ' · ' + clase.profesor + ' · ' + clase.lugar"
+          >
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+              <div class="text-right shrink-0 w-14">
+                <p class="text-sm font-bold text-slate-800">{{ clase.horaInicio }}</p>
+                <p class="text-xs text-slate-400">{{ clase.horaFin }}</p>
+              </div>
+              <div class="hidden sm:block w-px self-stretch bg-slate-200"></div>
+              <div [class]="clase.color.bg + ' ' + clase.color.text + ' w-11 h-11 rounded-xl flex items-center justify-center font-bold text-sm shrink-0'">
+                {{ clase.iniciales }}
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-semibold uppercase tracking-wide" [class]="claseCategoriaClase(clase.categoria)">
+                  {{ clase.categoria }}
+                </p>
+                <p class="text-sm font-bold text-slate-800 truncate">{{ clase.curso }}</p>
+                <p class="text-xs text-slate-500 truncate">{{ clase.profesor }} · {{ clase.lugar }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0 pl-[4.5rem] sm:pl-0">
+              @if (clase.modalidad === 'Virtual') {
+                <span class="flex items-center gap-1.5 rounded-full bg-violet-50 text-violet-600 px-3 py-1 text-xs font-bold" title="Clase virtual: se dicta en línea">
+                  <i class="fa-solid fa-video" aria-hidden="true"></i> Virtual
+                </span>
+                <button
+                  type="button"
+                  disabled
+                  title="Enlace de la clase virtual · disponible próximamente"
+                  class="flex items-center gap-1.5 rounded-full bg-aura-primary/40 text-white px-3.5 py-1.5 text-xs font-bold cursor-not-allowed"
+                >
+                  <i class="fa-solid fa-video" aria-hidden="true"></i> Unirse
+                </button>
+              } @else {
+                <span class="flex items-center gap-1.5 rounded-full bg-emerald-50 text-emerald-600 px-3 py-1 text-xs font-bold" [title]="'Clase presencial en ' + clase.lugar">
+                  <i class="fa-solid fa-location-dot" aria-hidden="true"></i> Presencial
+                </span>
+                <button
+                  type="button"
+                  disabled
+                  title="Aula virtual · disponible próximamente"
+                  class="flex items-center gap-1.5 rounded-full bg-aura-primary/40 text-white px-3.5 py-1.5 text-xs font-bold cursor-not-allowed"
+                >
+                  <i class="fa-solid fa-bolt" aria-hidden="true"></i> Ir a clase
+                </button>
+              }
+            </div>
+          </div>
+        } @empty {
+          @if (!academico.horario.isLoading()) {
+            <div class="rounded-2xl border border-dashed border-slate-200 px-6 py-10 text-center">
+              <p class="text-sm font-medium text-slate-600">No tienes clases con este filtro.</p>
+              <p class="text-xs text-slate-400 mt-1">Elige otro día o modalidad para ver tu agenda.</p>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA -->
+    <div class="flex flex-col gap-4 md:gap-6">
+
+      <!-- RESUMEN SEMANAL -->
+      <div class="bg-aura-sidebar rounded-xl md:rounded-2xl p-4 md:p-5 text-white shadow-md">
+        <div class="flex items-center gap-2 text-blue-300 text-xs font-bold tracking-wider mb-4">
+          <i class="fa-solid fa-chart-simple" aria-hidden="true"></i> HORAS ESTA SEMANA
+        </div>
+        <p class="text-3xl font-bold mb-1">{{ horasSemana() }}h</p>
+        <p class="text-xs text-slate-400 mb-6">{{ totalMaterias() }} materias · {{ totalSesiones() }} sesiones</p>
+
+        <div class="space-y-2.5">
+          @for (dia of resumenPorDia(); track dia.abbr) {
+            <div class="flex items-center gap-3 text-xs" [title]="dia.abbr + ': ' + dia.horas + ' horas de clase'">
+              <span class="w-8 text-slate-400 font-semibold">{{ dia.abbr }}</span>
+              <div class="flex-1 h-2 rounded-full bg-aura-sidebar-soft overflow-hidden">
+                <div class="h-full rounded-full bg-aura-primary-light" [style.width.%]="dia.porcentaje"></div>
+              </div>
+              <span class="w-8 text-right text-slate-300">{{ dia.horas }}h</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- PROXIMOS EVENTOS -->
+      <div class="bg-white rounded-xl md:rounded-2xl p-4 md:p-5 shadow-sm">
+        <h4 class="font-bold text-slate-800 flex items-center gap-2 mb-1">
+          <i class="fa-regular fa-bell text-blue-500" aria-hidden="true"></i> Próximos eventos
+        </h4>
+        <p class="text-xs text-slate-400 mb-4">Tu agenda cercana</p>
+
+        <div class="space-y-3">
+          @for (evento of proximosEventos; track evento.titulo) {
+            <div class="flex items-center gap-3" [title]="evento.titulo + ' · ' + evento.detalle + ' · ' + evento.dia + ' ' + evento.fecha + ' a las ' + evento.hora">
+              <div class="text-center shrink-0 w-11">
+                <p class="text-[10px] font-bold text-slate-400">{{ evento.dia }} {{ evento.fecha }}</p>
+                <p class="text-[10px] text-slate-300">{{ evento.hora }}</p>
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-slate-800 truncate">{{ evento.titulo }}</p>
+                <p class="text-xs text-slate-400 truncate">{{ evento.detalle }}</p>
+              </div>
+              <div [class]="evento.color + ' w-8 h-8 rounded-lg flex items-center justify-center text-xs shrink-0'">
+                <i [class]="evento.icono" aria-hidden="true"></i>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
