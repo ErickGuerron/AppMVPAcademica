@@ -153,3 +153,10 @@ Desktop.ini
 .sass-cache/
 # Configuracion local de herramientas de IA (Claude Code)
 .claude/
+
+# Configuracion local de editor y herramientas
+.vscode/
+.atl/
+
+# Assets locales (favicon): no se versionan
+/public/
